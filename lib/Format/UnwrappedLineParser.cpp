@@ -1876,10 +1876,14 @@ void UnwrappedLineParser::parseDoWhile() {
   parseStructuralElement();
 }
 
-void UnwrappedLineParser::parseLabel() {
+void UnwrappedLineParser::parseLabel(bool IsCaseLabel) {
+  if (FormatTok->Previous && FormatTok->Previous->is(tok::kw_default))
+      IsCaseLabel = true;
   nextToken();
   unsigned OldLineLevel = Line->Level;
-  if (Line->Level > 1 || (!Line->InPPDirective && Line->Level > 0))
+  if (!IsCaseLabel && !Style.IndentGotoLabels)
+    Line->Level = 0;
+  else if (Line->Level > 1 || (!Line->InPPDirective && Line->Level > 0))
     --Line->Level;
   if (CommentsBeforeNextToken.empty() && FormatTok->Tok.is(tok::l_brace)) {
     CompoundStatementIndenter Indenter(this, Style, Line->Level);
@@ -1908,7 +1912,7 @@ void UnwrappedLineParser::parseCaseLabel() {
   do {
     nextToken();
   } while (!eof() && !FormatTok->Tok.is(tok::colon));
-  parseLabel();
+  parseLabel(true);
 }
 
 void UnwrappedLineParser::parseSwitch() {

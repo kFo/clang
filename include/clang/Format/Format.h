@@ -1069,6 +1069,36 @@ struct FormatStyle {
   /// \endcode
   bool IndentCaseLabels;
 
+  /// Indent labels according to ``IndentCaseLabels``.
+  ///
+  /// When ``false`` the label will be flush with the left margin.
+  /// \code
+  /// false:                                        false:                             
+  /// bool f() {                             vs.    bool f() {                         
+  ///   for (int i = 0; i < N; ++i) {                 for (int i = 0; i < N; ++i) {    
+  ///     for (int j = 0; j < M; ++j) {                 for (int j = 0; j < M; ++j) {  
+  ///       for (int k = 0; k < K; ++k) {                 for (int k = 0; k < K; ++k) {
+  ///         switch (condition) {                          switch (condition) {       
+  ///         case 1:                                       case 1:
+  ///           goto L_skip;                                  goto L_skip;
+  ///         case 2:                                       case 2:
+  ///           continue;                                     continue;
+  ///         default:                                      default:
+  ///           goto L_error;                                 goto L_error;
+  ///       }                                             }
+  ///     }                                             }
+  /// L_skip:                                         L_skip:
+  ///     continue;                                     continue;
+  ///   }                                             }
+  /// 
+  ///   return true;                                  return true;
+  /// 
+  /// L_error:                                      L_error:
+  ///   return false;                                 return false;
+  /// }                                             }
+  /// \endcode
+  bool IndentGotoLabels;
+
   /// Options for indenting preprocessor directives.
   enum PPDirectiveIndentStyle {
     /// Does not indent any directives.
@@ -1749,6 +1779,7 @@ struct FormatStyle {
            IncludeStyle.IncludeBlocks == R.IncludeStyle.IncludeBlocks &&
            IncludeStyle.IncludeCategories == R.IncludeStyle.IncludeCategories &&
            IndentCaseLabels == R.IndentCaseLabels &&
+           IndentGotoLabels == R.IndentGotoLabels &&
            IndentPPDirectives == R.IndentPPDirectives &&
            IndentWidth == R.IndentWidth && Language == R.Language &&
            IndentWrappedFunctionNames == R.IndentWrappedFunctionNames &&
