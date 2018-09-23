@@ -268,6 +268,21 @@ struct ScalarEnumerationTraits<FormatStyle::SpaceBeforeParensOptions> {
   }
 };
 
+template <>
+struct ScalarEnumerationTraits<FormatStyle::SpacesInParenthesesOptions> {
+  static void enumeration(IO &IO,
+                          FormatStyle::SpacesInParenthesesOptions &Value) {
+    IO.enumCase(Value, "Never", FormatStyle::SIPO_Never);
+    IO.enumCase(Value, "ControlStatements",
+                FormatStyle::SIPO_ControlStatements);
+    IO.enumCase(Value, "Always", FormatStyle::SIPO_Always);
+
+    // For backward compatibility.
+    IO.enumCase(Value, "false", FormatStyle::SIPO_Never);
+    IO.enumCase(Value, "true", FormatStyle::SIPO_Always);
+  }
+};
+
 template <> struct MappingTraits<FormatStyle> {
   static void mapping(IO &IO, FormatStyle &Style) {
     // When reading, read the language first, we need it for getPredefinedStyle.
@@ -687,7 +702,7 @@ FormatStyle getLLVMStyle() {
   LLVMStyle.Standard = FormatStyle::LS_Cpp11;
   LLVMStyle.UseTab = FormatStyle::UT_Never;
   LLVMStyle.ReflowComments = true;
-  LLVMStyle.SpacesInParentheses = false;
+  LLVMStyle.SpacesInParentheses = FormatStyle::SIPO_Never;
   LLVMStyle.SpacesInSquareBrackets = false;
   LLVMStyle.SpaceInEmptyParentheses = false;
   LLVMStyle.SpacesInContainerLiterals = true;

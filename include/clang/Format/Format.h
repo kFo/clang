@@ -1622,12 +1622,40 @@ struct FormatStyle {
   /// \endcode
   bool SpacesInCStyleCastParentheses;
 
-  /// If ``true``, spaces will be inserted after ``(`` and before ``)``.
-  /// \code
-  ///    true:                                  false:
-  ///    t f( Deleted & ) & = delete;   vs.     t f(Deleted &) & = delete;
-  /// \endcode
-  bool SpacesInParentheses;
+  /// Different ways to put spaces inside parentheses.
+  enum SpacesInParenthesesOptions {
+      /// Never put spaces inside parentheses.
+      /// \code
+      /// void f(bool x) {
+      ///   if (true) {
+      ///     f(false);
+      ///   }
+      /// }
+      /// \endcode
+      SIPO_Never,
+      /// Put spaces inside the parentheses only after control statement
+      /// keywords (``for/if/while...``).
+      /// \code
+      /// void f(bool x) {
+      ///   if ( true ) {
+      ///     f(false);
+      ///   }
+      /// }
+      /// \endcode
+      SIPO_ControlStatements,
+      /// Always puts spaces inside parentheses.
+      /// \code
+      /// void f( bool x ) {
+      ///   if ( true ) {
+      ///     f( false );
+      ///   }
+      /// }
+      /// \endcode
+      SIPO_Always
+  };
+
+  /// Defines in which cases to put a spaces inside parentheses.
+  SpacesInParenthesesOptions SpacesInParentheses;
 
   /// If ``true``, spaces will be inserted after ``[`` and before ``]``.
   /// Lambdas or unspecified size array declarations will not be affected.

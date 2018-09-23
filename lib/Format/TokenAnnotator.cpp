@@ -2403,11 +2403,20 @@ bool TokenAnnotator::spaceRequiredBetween(const AnnotatedLine &Line,
     return Right.is(tok::hash);
   if (Left.is(tok::l_paren) && Right.is(tok::r_paren))
     return Style.SpaceInEmptyParentheses;
+  if (Style.SpacesInParentheses == FormatStyle::SIPO_ControlStatements) {
+      if (Left.is(tok::l_paren)) {
+          if (Left.Previous && Left.Previous->isOneOf(tok::kw_if, tok::pp_elif, tok::kw_for, tok::kw_while, tok::kw_switch, TT_ForEachMacro, TT_ObjCForIn))
+            return true;
+      }
+      else if (Right.is(tok::r_paren) && Right.MatchingParen && Right.MatchingParen->Previous)
+          if (Right.MatchingParen->Previous->isOneOf(tok::kw_if, tok::pp_elif, tok::kw_for, tok::kw_while, tok::kw_switch, TT_ForEachMacro, TT_ObjCForIn))
+              return true;
+  }
   if (Left.is(tok::l_paren) || Right.is(tok::r_paren))
     return (Right.is(TT_CastRParen) ||
             (Left.MatchingParen && Left.MatchingParen->is(TT_CastRParen)))
                ? Style.SpacesInCStyleCastParentheses
-               : Style.SpacesInParentheses;
+               : Style.SpacesInParentheses == FormatStyle::SIPO_Always;
   if (Right.isOneOf(tok::semi, tok::comma))
     return false;
   if (Right.is(tok::less) && Line.Type == LT_ObjCDecl) {
@@ -2785,7 +2794,7 @@ bool TokenAnnotator::spaceRequiredBefore(const AnnotatedLine &Line,
            !(Left.isOneOf(tok::l_paren, tok::r_paren, tok::l_square,
                           tok::kw___super, TT_TemplateCloser,
                           TT_TemplateOpener)) ||
-           (Left.is(tok ::l_paren) && Style.SpacesInParentheses);
+           (Left.is(tok ::l_paren) && Style.SpacesInParentheses == FormatStyle::SIPO_Always);
   if ((Left.is(TT_TemplateOpener)) != (Right.is(TT_TemplateCloser)))
     return Style.SpacesInAngles;
   // Space before TT_StructuredBindingLSquare.
